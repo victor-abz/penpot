@@ -7,7 +7,6 @@
 (ns app.browser
   (:require
    ["generic-pool" :as gp]
-   ["puppeteer-core" :as pp]
    ["playwright" :as pw]
    [app.common.data :as d]
    [app.common.logging :as l]
@@ -38,24 +37,20 @@
               :value token}]))
 
 (defn nav!
-  {:playwright true}
   ([page url] (nav! page url nil))
   ([page url {:keys [wait-until timeout] :or {wait-until "networkidle" timeout 20000}}]
    (.goto ^js page (str url) #js {:waitUntil wait-until :timeout timeout})))
 
 (defn sleep
-  {:playwright true}
   [page ms]
   (.waitForTimeout ^js page ms))
 
 (defn wait-for
-  {:playwright true}
   ([locator] (wait-for locator nil))
   ([locator {:keys [state timeout] :or {state "visible" timeout 10000}}]
    (.waitFor ^js locator #js {:state state :timeout timeout})))
 
 (defn screenshot
-  {:playwright true}
   ([frame] (screenshot frame {}))
   ([frame {:keys [full-page? omit-background? type quality]
            :or {type "png" full-page? false omit-background? false quality 95}}]
@@ -68,13 +63,11 @@
      (.screenshot ^js frame options))))
 
 (defn emulate-media!
-  {:playwright true}
   [page {:keys [media]}]
   (.emulateMedia ^js page #js {:media media})
   page)
 
 (defn pdf
-  {:playwright true}
   ([page] (pdf page {}))
   ([page {:keys [width height scale save-path]
           :or {width default-viewport-width
@@ -87,12 +80,10 @@
                         :printBackground true
                         :preferCSSPageSize true})))
 (defn eval!
-  {:playwright true}
   [frame f]
   (.evaluate ^js frame f))
 
 (defn select
-  {:playwright true}
   [frame selector]
   (.locator ^js frame selector))
 
