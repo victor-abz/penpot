@@ -9,15 +9,13 @@
   "author": "UXBOX LABS SL",
   "license": "SEE LICENSE IN <LICENSE>",
   "dependencies": {
-    "@sentry/node": "^6.16.1",
-    "@sentry/tracing": "^6.16.1",
     "cookies": "^0.8.0",
     "generic-pool": "^3.8.2",
     "inflation": "^2.0.0",
     "jszip": "^3.7.0",
     "luxon": "^2.3.0",
     "playwright": "^1.19.1",
-    "raw-body": "^2.4.2",
+    "raw-body": "^2.4.3",
     "xml-js": "^1.6.11",
     "xregexp": "^5.0.2"
   },
