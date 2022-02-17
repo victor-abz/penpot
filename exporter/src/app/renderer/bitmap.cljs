@@ -41,9 +41,7 @@
         (p/let [node (bw/select page "#screenshot")]
           (bw/wait-for node)
           (bw/eval! page (js* "() => document.body.style.background = 'transparent'"))
-          (p/let [kaka (bw/eval! page (js* "() => screen.width"))]
-            (js/console.log "KKKK" kaka))
-          (bw/sleep page 2000)
+          (bw/sleep page 2000) ; the good old fix with sleep
           (case type
             :png  (bw/screenshot node {:omit-background? true :type type})
             :jpeg (bw/screenshot node {:omit-background? false :type type}))))))))
@@ -57,14 +55,23 @@
 (s/def ::scale ::us/number)
 (s/def ::token ::us/string)
 (s/def ::filename ::us/string)
+(s/def ::origin ::us/string)
 
 (s/def ::render-params
   (s/keys :req-un [::name ::suffix ::type ::object-id ::page-id ::scale ::token ::file-id]
-          :opt-un [::filename]))
+          :opt-un [::filename ::origin]))
 
 (defn render
   [params]
-  (us/assert ::render-params params)
+  (us/verify ::render-params params)
+
+  (when (and (:origin params)
+             (not (contains? (cfg/get :origin-white-list) (:origin params))))
+    (ex/raise :type :validation
+              :code :invalid-origin
+              :hint "invalid origin"
+              :origin (:origin params)))
+
   (p/let [content (screenshot-object params)]
     {:content content
      :filename (or (:filename params)

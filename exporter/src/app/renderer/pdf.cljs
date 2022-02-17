@@ -16,15 +16,6 @@
    [lambdaisland.uri :as u]
    [promesa.core :as p]))
 
-(defn create-cookie
-  [uri token]
-  (let [domain (str (:host uri)
-                (when (:port uri)
-                  (str ":" (:port uri))))]
-    {:domain domain
-     :key "auth-token"
-     :value token}))
-
 (defn pdf-from-object
   [{:keys [file-id page-id object-id token scale type save-path]}]
   (p/let [path (str "/render-object/" file-id "/" page-id "/" object-id)
