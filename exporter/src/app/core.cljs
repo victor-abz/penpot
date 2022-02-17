@@ -10,12 +10,10 @@
    [app.common.logging :as l]
    [app.config]
    [app.http :as http]
-   [app.sentry :as sentry]
    [promesa.core :as p]))
 
 (enable-console-print!)
 (l/initialize!)
-(sentry/init!)
 
 (defonce state (atom nil))
 

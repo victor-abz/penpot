@@ -19,43 +19,34 @@
    [lambdaisland.uri :as u]
    [promesa.core :as p]))
 
-(defn create-cookie
-  [uri token]
-  (let [domain (str (:host uri)
-                (when (:port uri)
-                  (str ":" (:port uri))))]
-    {:domain domain
-     :key "auth-token"
-     :value token}))
-
 (defn screenshot-object
   [{:keys [file-id page-id object-id token scale type]}]
-  (letfn [(handle [page]
-            (let [path   (str "/render-object/" file-id "/" page-id "/" object-id)
-                  uri    (-> (u/uri (cf/get :public-uri))
-                             (assoc :path "/")
-                             (assoc :fragment path))
-                  cookie (create-cookie uri token)]
-              (screenshot page (str uri) cookie)))
-
-          (screenshot [page uri cookie]
-            (l/info :uri uri)
-            (let [viewport {:width 1920
-                            :height 1080
-                            :scale scale}
-                  options  {:viewport viewport
-                            :cookie cookie}]
-              (p/do!
-               (bw/configure-page! page options)
-               (bw/navigate! page uri)
-               (bw/eval! page (js* "() => document.body.style.background = 'transparent'"))
-               (bw/wait-for page "#screenshot")
-               (p/let [dom (bw/select page "#screenshot")]
-                 (case type
-                   :png  (bw/screenshot dom {:omit-background? true :type type})
-                   :jpeg (bw/screenshot dom {:omit-background? false :type type}))))))]
-
-    (bw/exec! handle)))
+  (p/let [path (str "/render-object/" file-id "/" page-id "/" object-id)
+          uri  (-> (u/uri (cf/get :public-uri))
+                   (assoc :path "/")
+                   (assoc :fragment path))]
+    (bw/exec!
+     #js {:screen #js {:width bw/default-viewport-width
+                       :height bw/default-viewport-height}
+          :viewport #js {:width bw/default-viewport-width
+                         :height bw/default-viewport-height}
+          :locale "en-US"
+          :storageState #js {:cookies (bw/create-cookies uri {:token token})}
+          :deviceScaleFactor scale
+          :userAgent bw/default-user-agent}
+     (fn [page]
+       (l/info :uri uri)
+       (p/do!
+        (bw/nav! page (str uri))
+        (p/let [node (bw/select page "#screenshot")]
+          (bw/wait-for node)
+          (bw/eval! page (js* "() => document.body.style.background = 'transparent'"))
+          (p/let [kaka (bw/eval! page (js* "() => screen.width"))]
+            (js/console.log "KKKK" kaka))
+          (bw/sleep page 2000)
+          (case type
+            :png  (bw/screenshot node {:omit-background? true :type type})
+            :jpeg (bw/screenshot node {:omit-background? false :type type}))))))))
 
 (s/def ::name ::us/string)
 (s/def ::suffix ::us/string)
