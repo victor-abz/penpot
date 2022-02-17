@@ -97,13 +97,6 @@
 (defonce pool (atom nil))
 (defonce pool-browser-id (atom 1))
 
-(def default-chrome-args
-  #js ["--no-sandbox"
-       "--font-render-hinting=none"
-       "--disable-setuid-sandbox"
-       "--disable-accelerated-2d-canvas"
-       "--disable-gpu"])
-
 (def browser-pool-factory
   (letfn [(create []
             (p/let [browser (.launch pw/chromium)

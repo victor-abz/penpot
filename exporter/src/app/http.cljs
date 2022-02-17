@@ -11,7 +11,6 @@
    [app.http.export :refer [export-handler]]
    [app.http.export-frames :refer [export-frames-handler]]
    [app.http.impl :as impl]
-   [app.sentry :as sentry]
    [app.util.transit :as t]
    [cuerdas.core :as str]
    [promesa.core :as p]
@@ -28,9 +27,6 @@
 (defn- on-error
   [error request]
   (let [{:keys [type message code] :as data} (ex-data error)]
-    (sentry/capture-exception error {::sentry/request request
-                                     :ex-data data})
-
     (cond
       (= :validation type)
       (let [header (get-in request [:headers "accept"])]
