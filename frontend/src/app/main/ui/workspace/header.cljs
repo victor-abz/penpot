@@ -297,7 +297,8 @@
 
        [:li {:on-click (fn []
                          (r/set-resize-type! :bottom)
-                         (st/emit! (dw/remove-layout-flags :textpalette)
+                         (st/emit! (dw/save-colorpalete-status :toggle)
+                                   (dw/remove-layout-flags :textpalette)
                                    (dw/toggle-layout-flags :colorpalette)))}
         [:span
          (if (contains? layout :colorpalette)
@@ -307,7 +308,8 @@
 
        [:li {:on-click (fn []
                          (r/set-resize-type! :bottom)
-                         (st/emit! (dw/remove-layout-flags :colorpalette)
+                         (st/emit! (dw/save-colorpalete-status false)
+                                   (dw/remove-layout-flags :colorpalette)
                                    (dw/toggle-layout-flags :textpalette)))}
         [:span
          (if (contains? layout :textpalette)

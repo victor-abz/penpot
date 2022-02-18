@@ -13,6 +13,7 @@
    [app.main.data.workspace.state-helpers :as wsh]
    [app.main.data.workspace.texts :as dwt]
    [app.main.repo :as rp]
+   [app.util.storage :refer [storage]]
    [beicon.core :as rx]
    [cljs.spec.alpha :as s]
    [potok.core :as ptk]))
@@ -24,6 +25,9 @@
       (assoc-in state [:workspace-local :color-for-rename] nil))))
 
 (declare rename-color-result)
+(declare set-current-colorpalette-selected!)
+(declare set-current-colorpalette-show!)
+(declare set-current-colorpicker-selected!)
 
 (defn rename-color
   [file-id color-id name]
@@ -55,6 +59,7 @@
   (ptk/reify ::change-palette-selected
     ptk/UpdateEvent
     (update [_ state]
+      (set-current-colorpalette-selected! selected)
       (-> state
           (assoc-in [:workspace-local :selected-palette] selected)))))
 
@@ -64,6 +69,7 @@
   (ptk/reify ::change-palette-selected-colorpicker
     ptk/UpdateEvent
     (update [_ state]
+      (set-current-colorpicker-selected! selected)
       (-> state
           (assoc-in [:workspace-local :selected-palette-colorpicker] selected)))))
 
@@ -73,6 +79,7 @@
   (ptk/reify ::show-palette
     ptk/UpdateEvent
     (update [_ state]
+      (set-current-colorpalette-show! true)
       (-> state
           (update :workspace-layout conj :colorpalette)
           (assoc-in [:workspace-local :selected-palette] selected)))))
@@ -327,3 +334,27 @@
     (update [_ state]
       (-> state
           (assoc-in [:workspace-local :editing-stop] spot)))))
+
+(defn set-current-colorpalette-show!
+  [status]
+  (swap! storage assoc ::colorpalette-show status))
+
+(defn current-colorpalette-show?
+  []
+  (::colorpalette-show @storage))
+
+(defn set-current-colorpalette-selected!
+  [selected]
+  (swap! storage assoc ::colorpalette-selected selected))
+
+(defn get-current-colorpalette-selected
+  []
+  (or (::colorpalette-selected @storage) :recent))
+
+(defn set-current-colorpicker-selected!
+  [selected]
+  (swap! storage assoc ::colorpicker-selected selected))
+
+(defn get-current-colorpicker-selected
+  []
+  (or (::colorpicker-selected @storage) :recent))
