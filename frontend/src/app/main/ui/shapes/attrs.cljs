@@ -196,8 +196,10 @@
 
          styles (-> (obj/get props "style" (obj/new))
                     (obj/merge! svg-styles)
-                    (add-stroke shape render-id 0)
+                    (add-stroke (get-in shape [:strokes 0]) render-id 0)
                     (add-layer-props shape))
+         
+         _ (println "styles1" styles)
 
          styles (cond (or (some? (:fill-image shape))
                           (= :image (:type shape))
@@ -212,7 +214,15 @@
                       (obj/set! "fillOpacity" (obj/get svg-styles "fillOpacity")))
 
                   :else
-                  (add-fill styles (get-in shape [:fills 0]) render-id 0))]
+                  (add-fill styles (get-in shape [:fills 0]) render-id 0))
+         _ (println "styles2" styles)
+         _ (println "styles3" (-> props
+                                  (obj/merge! svg-attrs)
+                                  (add-border-radius shape)
+                                  (obj/set! "style" styles)))
+
+         
+         ]
 
      (-> props
          (obj/merge! svg-attrs)
