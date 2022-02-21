@@ -320,14 +320,10 @@
               unames  (dwc/retrieve-used-names pages)
               name    (dwc/generate-unique-name unames "Page-1")
 
-              rchange {:type :add-page
-                       :id id
-                       :name name}
-              uchange {:type :del-page
-                       :id id}]
-          (rx/of (dch/commit-changes {:redo-changes [rchange]
-                                      :undo-changes [uchange]
-                                      :origin it})))))))
+              changes (-> (pcb/empty-changes it)
+                          (pcb/add-empty-page id name))]
+
+          (rx/of (dch/commit-changes changes)))))))
 
 (defn duplicate-page
   [page-id]
@@ -342,13 +338,10 @@
 
             page (-> page (assoc :name name :id id))
 
-            rchange {:type :add-page
-                     :page page}
-            uchange {:type :del-page
-                     :id id}]
-        (rx/of (dch/commit-changes {:redo-changes [rchange]
-                                    :undo-changes [uchange]
-                                    :origin it}))))))
+            changes (-> (pcb/empty-changes it)
+                        (pcb/add-page id page))]
+
+        (rx/of (dch/commit-changes changes))))))
 
 (s/def ::rename-page
   (s/keys :req-un [::id ::name]))
@@ -360,33 +353,26 @@
   (ptk/reify ::rename-page
     ptk/WatchEvent
     (watch [it state _]
-      (let [page (get-in state [:workspace-data :pages-index id])
-            rchg {:type :mod-page
-                  :id id
-                  :name name}
-            uchg {:type :mod-page
-                  :id id
-                  :name (:name page)}]
-        (rx/of (dch/commit-changes {:redo-changes [rchg]
-                                    :undo-changes [uchg]
-                                    :origin it}))))))
+      (let [page    (get-in state [:workspace-data :pages-index id])
+            changes (-> (pcb/empty-changes it)
+                        (pcb/mod-page page name))]
+
+        (rx/of (dch/commit-changes changes))))))
 
 (declare purge-page)
 (declare go-to-file)
 
-;; TODO: for some reason, the page-id here in some circumstances is `nil`
 (defn delete-page
   [id]
   (ptk/reify ::delete-page
     ptk/WatchEvent
     (watch [it state _]
       (let [page (get-in state [:workspace-data :pages-index id])
-            rchg {:type :del-page :id id}
-            uchg {:type :add-page :page page}]
 
-        (rx/of (dch/commit-changes {:redo-changes [rchg]
-                                    :undo-changes [uchg]
-                                    :origin it})
+            changes (-> (pcb/empty-changes it)
+                        (pcb/del-page page))]
+
+        (rx/of (dch/commit-changes changes)
                (when (= id (:current-page-id state))
                  go-to-file))))))
 
