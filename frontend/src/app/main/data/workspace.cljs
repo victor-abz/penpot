@@ -1156,8 +1156,8 @@
     (watch [it state _]
       (let [prev-index (-> (get-in state [:workspace-data :pages])
                            (d/index-of id))
-            changes    (-> (pcb/empty-changes it id)
-                           (pcb/move-page index prev-index))]
+            changes    (-> (pcb/empty-changes it)
+                           (pcb/mov-page id index prev-index))]
         (rx/of (dch/commit-changes changes))))))
 
 ;; --- Shape / Selection Alignment and Distribution

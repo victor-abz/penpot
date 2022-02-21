@@ -31,46 +31,58 @@
 (defn with-objects [changes objects]
   (vary-meta changes assoc ::objects objects))
 
+(defn assert-page-id
+  [changes]
+  (assert (contains? (meta changes) ::page-id) "Give a page-id or call (with-page) before using this function"))
+
+(defn assert-page
+  [changes]
+  (assert (contains? (meta changes) ::page) "Call (with-page) before using this function"))
+
+(defn assert-objects
+  [changes]
+  (assert (contains? (meta changes) ::objects) "Call (with-objects) before using this function"))
+
 ;; Page changes
 
 (defn add-empty-page
-  [chdata id name]
-  (-> chdata
+  [changes id name]
+  (-> changes
       (update :redo-changes conj {:type :add-page :id id :name name})
       (update :undo-changes conj {:type :del-page :id id})))
 
 (defn add-page
-  [chdata id page]
-  (-> chdata
+  [changes id page]
+  (-> changes
       (update :redo-changes conj {:type :add-page :id id :page page})
       (update :undo-changes conj {:type :del-page :id id})))
 
 (defn mod-page
-  [chdata page new-name]
-  (-> chdata
+  [changes page new-name]
+  (-> changes
       (update :redo-changes conj {:type :mod-page :id (:id page) :name new-name})
       (update :undo-changes conj {:type :mod-page :id (:id page) :name (:name page)})))
 
 (defn del-page
-  [chdata page]
-  (-> chdata
+  [changes page]
+  (-> changes
       (update :redo-changes conj {:type :del-page :id (:id page)})
       (update :undo-changes conj {:type :add-page :id (:id page) :page page})))
 
-(defn move-page
-  [chdata index prev-index]
-  (let [page-id (::page-id (meta chdata))]
-    (-> chdata
-        (update :redo-changes conj {:type :mov-page :id page-id :index index})
-        (update :undo-changes conj {:type :mov-page :id page-id :index prev-index}))))
+(defn mov-page
+  [changes page-id index prev-index]
+  (-> changes
+      (update :redo-changes conj {:type :mov-page :id page-id :index index})
+      (update :undo-changes conj {:type :mov-page :id page-id :index prev-index})))
 
 (defn set-page-option
-  [chdata option-key option-val]
-  (let [page-id (::page-id (meta chdata))
-        page (::page (meta chdata))
+  [changes option-key option-val]
+  (assert-page changes)
+  (let [page-id (::page-id (meta changes))
+        page (::page (meta changes))
         old-val (get-in page [:options option-key])]
 
-    (-> chdata
+    (-> changes
         (update :redo-changes conj {:type :set-option
                                     :page-id page-id
                                     :option option-key
@@ -87,6 +99,7 @@
    (add-obj changes (assoc obj ::index index)))
 
   ([changes obj]
+   (assert-page-id changes)
    (let [add-change
          {:type      :add-obj
           :id        (:id obj)
@@ -106,10 +119,12 @@
          (update :undo-changes d/preconj del-change)))))
 
 (defn change-parent
-  ([changes parent-id shapes] (change-parent changes parent-id shapes nil))
-  ([changes parent-id shapes index]
-   (assert (contains? (meta changes) ::objects) "Call (with-objects) first to use this function")
+  ([changes parent-id shapes]
+   (change-parent changes parent-id shapes nil))
 
+  ([changes parent-id shapes index]
+   (assert-page-id changes)
+   (assert-objects changes)
    (let [objects (::objects (meta changes))
          set-parent-change
          (cond-> {:type :mov-objects
@@ -153,7 +168,8 @@
    (update-shapes changes ids update-fn nil))
 
   ([changes ids update-fn {:keys [attrs ignore-geometry?] :or {attrs nil ignore-geometry? false}}]
-   (assert (contains? (meta changes) ::objects) "Call (with-objects) first to use this function")
+   (assert-page-id changes)
+   (assert-objects changes)
    (let [objects (::objects (meta changes))
 
          update-shape
@@ -187,7 +203,8 @@
 
 (defn remove-objects
   [changes ids]
-  (assert (contains? (meta changes) ::objects) "Call (with-objects) first to use this function")
+  (assert-page-id changes)
+  (assert-objects changes)
   (let [page-id (::page-id (meta changes))
         objects (::objects (meta changes))
 
