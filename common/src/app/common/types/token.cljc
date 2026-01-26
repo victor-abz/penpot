@@ -474,8 +474,8 @@
    :height #{:sizing :dimensions}
    :max-width #{:sizing :dimensions}
    :max-height #{:sizing :dimensions}
-   :x #{:spacing :dimensions}
-   :y #{:spacing :dimensions}
+   :x #{:dimensions}
+   :y #{:dimensions}
    :rotation #{:number :rotation}
    :border-radius #{:border-radius :dimensions}
    :row-gap #{:spacing :dimensions}
@@ -488,6 +488,7 @@
    :sided-margins #{:spacing :dimensions}
    :line-height #{:line-height :number}
    :opacity #{:opacity}
+   :stroke-width #{:stroke-width :dimensions}
    :font-size #{:font-size}
    :letter-spacing #{:letter-spacing}
    :fill #{:color}

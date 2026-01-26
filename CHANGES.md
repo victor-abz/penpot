@@ -19,13 +19,17 @@
 
 ### :bug: Bugs fixed
 
+- Remove whitespaces from asset export filename [Github #8133](https://github.com/penpot/penpot/pull/8133)
 - Fix prototype connections lost when switching between variants [Taiga #12812](https://tree.taiga.io/project/penpot/issue/12812)
 - Fix wrong image in the onboarding invitation block [Taiga #13040](https://tree.taiga.io/project/penpot/issue/13040)
 - Fix wrong register image [Taiga #12955](https://tree.taiga.io/project/penpot/task/12955)
 - Fix error message on components doesn't close automatically [Taiga #12012](https://tree.taiga.io/project/penpot/issue/12012)
+- Fix incorrect handling of input values on layout gap and padding inputs [Github #8113](https://github.com/penpot/penpot/issues/8113)
 - Fix incorrect default option on tokens import dialog [Github #8051](https://github.com/penpot/penpot/pull/8051)
 - Fix unhandled exception tokens creation dialog [Github #8110](https://github.com/penpot/penpot/issues/8110)
 - Fix displaying a hidden user avatar when there is only one more [Taiga #13058](https://tree.taiga.io/project/penpot/issue/13058)
+- Fix unhandled exception on open-new-window helper [Github #7787](https://github.com/penpot/penpot/issues/7787)
+- Fix exception on uploading large fonts [Github #8135](https://github.com/penpot/penpot/pull/8135)
 
 ## 2.13.0 (Unreleased)
 
@@ -61,6 +65,11 @@
 - Fix unhandled exception tokens creation dialog [Github #8110](https://github.com/penpot/penpot/issues/8110)
 - Fix allow negative spread values on shadow token creation [Taiga #13167](https://tree.taiga.io/project/penpot/issue/13167)
 - Fix spanish translations on import export token modal [Taiga #13171](https://tree.taiga.io/project/penpot/issue/13171)
+- Remove whitespaces from asset export filename [Github #8133](https://github.com/penpot/penpot/pull/8133)
+- Fix exception on uploading large fonts [Github #8135](https://github.com/penpot/penpot/pull/8135)
+- Fix unhandled exception on open-new-window helper [Github #7787](https://github.com/penpot/penpot/issues/7787)
+- Fix incorrect handling of input values on layout gap and padding inputs [Github #8113](https://github.com/penpot/penpot/issues/8113)
+
 
 ## 2.12.1
 
